@@ -1,9 +1,5 @@
-name: Flutter Checks on Pull Requests
-
-on:
-  pull_request:
-    branches:
-      - main
+# Should be called on pull_requests
+name: Flutter PR Checks
 
 # https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
 jobs:
