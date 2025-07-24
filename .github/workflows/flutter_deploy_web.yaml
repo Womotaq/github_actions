@@ -14,7 +14,7 @@ on:
 
 # https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
 jobs:
-  build_using_flutter_checks:
+  build:
     uses: Womotaq/github_actions/.github/workflows/flutter_checks.yaml@main
     secrets:
       FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
