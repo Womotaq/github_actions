@@ -92,6 +92,10 @@ on:
     secrets:
       FIREBASE_OPTIONS_DART:
         required: true
+      GOOGLE_SERVICES_JSON: # If provided, will build for android
+        required: false
+      GOOGLE_SERVICE_INFO_PLIST: # If provided, will build for iOS
+        required: false
 
 jobs:
   build:
@@ -101,10 +105,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set environment variables
+        run: |
+          echo "HAS_GOOGLE_SERVICES_JSON=${{ secrets.GOOGLE_SERVICES_JSON != '' }}" >> $GITHUB_ENV
+          echo "HAS_GOOGLE_SERVICE_INFO_PLIST=${{ secrets.GOOGLE_SERVICE_INFO_PLIST != '' }}" >> $GITHUB_ENV
+
       - name: Create Firebase Options file (lib/firebase_options.dart)
         run: |
           echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+          cat lib/firebase_options.dart
         shell: bash
 
-      - name: Debug Firebase Options file
-        run: cat lib/firebase_options.dart
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # TODO : only triggered by wo_form_example
+      - name: Update wo_form version file
+        run: dart lib/wo_form_version/generate_version.dart
+
+      - name: Build Flutter Web
+        run: flutter build web
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web
