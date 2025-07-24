@@ -1,93 +1,8 @@
-# # Should be called on pull_requests
-# name: Flutter PR Checks
-
-# on:
-#   # This line allows the workflow to be called by other workflows
-#   workflow_call:
-#     secrets:
-#       FIREBASE_OPTIONS_DART:
-#         required: true
-#       GOOGLE_SERVICES_JSON: # If provided, will build for android
-#         required: false
-#       GOOGLE_SERVICE_INFO_PLIST: # If provided, will build for iOS
-#         required: false
-
-# # https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest # macos-latest if needing an ios build
-
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v4
-
-#       - name: Set environment variables
-#         run: |
-#           echo "HAS_GOOGLE_SERVICES_JSON=${{ secrets.GOOGLE_SERVICES_JSON != '' }}" >> $GITHUB_ENV
-#           echo "HAS_GOOGLE_SERVICE_INFO_PLIST=${{ secrets.GOOGLE_SERVICE_INFO_PLIST != '' }}" >> $GITHUB_ENV
-
-#       # For android builds
-#       # Duration: ~3 minutes
-#       - name: Set Up Java
-#         if: env.HAS_GOOGLE_SERVICES_JSON == 'true'
-#         uses: actions/setup-java@v3.12.0
-#         with:
-#           distribution: "oracle"
-#           java-version: "17"
-
-#       - name: Set up Flutter
-#         uses: subosito/flutter-action@v2
-#         with:
-#           channel: "stable"
-
-#       - name: Create Firebase Options file (lib/firebase_options.dart)
-#         # run: |
-#         #   echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
-#         # run: |
-#         #   # Use heredoc syntax for robust multi-line file creation
-#         #   cat << EOF > lib/firebase_options.dart
-#         #   ${{ secrets.FIREBASE_OPTIONS_DART }}
-#         #   EOF
-#         run: |
-#           echo "${{ secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > lib/firebase_options.dart
-#         shell: bash
-
-#       - name: Debug Firebase Options file
-#         run: cat lib/firebase_options.dart
-
-#       - name: Create Google Services JSON (android/app/google-services.json)
-#         if: env.HAS_GOOGLE_SERVICES_JSON == 'true'
-#         run: |
-#           mkdir -p android/app/
-#           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
-#         shell: bash
-
-#       - name: Create GoogleService-Info.plist (ios/Runner/GoogleService-Info.plist)
-#         if: env.HAS_GOOGLE_SERVICE_INFO_PLIST == 'true'
-#         run: |
-#           mkdir -p ios/Runner/
-#           echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
-#         shell: bash
-
-#       - name: Install dependencies
-#         run: flutter pub get
-
-#       # TODO : only triggered by wo_form_example
-#       - name: Update wo_form version file
-#         run: dart lib/wo_form_version/generate_version.dart
-
-#       - name: Build Flutter Web
-#         run: flutter build web
-
-#       - name: Upload build artifacts
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: web-build
-#           path: build/web
-
+# Should be called on pull_requests
 name: Flutter PR Checks
 
 on:
+  # This line allows the workflow to be called by other workflows
   workflow_call:
     secrets:
       FIREBASE_OPTIONS_DART:
@@ -99,7 +14,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # macos-latest if needing an ios build
 
     steps:
       - name: Checkout repository
@@ -113,6 +28,20 @@ jobs:
       - name: Create Firebase Options file (lib/firebase_options.dart)
         run: |
           echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+        shell: bash
+
+      - name: Create Google Services JSON (android/app/google-services.json)
+        if: env.HAS_GOOGLE_SERVICES_JSON == 'true'
+        run: |
+          mkdir -p android/app/
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
+        shell: bash
+
+      - name: Create GoogleService-Info.plist (ios/Runner/GoogleService-Info.plist)
+        if: env.HAS_GOOGLE_SERVICE_INFO_PLIST == 'true'
+        run: |
+          mkdir -p ios/Runner/
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
         shell: bash
 
       - name: Set up Flutter
