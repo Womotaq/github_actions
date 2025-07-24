@@ -1,6 +1,9 @@
 name: Flutter Deploy Web
 
 on:
+  # This line allows the workflow to be called by other workflows
+  workflow_call:
+
   push:
     branches:
       - main

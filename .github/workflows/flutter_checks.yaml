@@ -1,6 +1,10 @@
 # Should be called on pull_requests
 name: Flutter PR Checks
 
+on:
+  # This line allows the workflow to be called by other workflows
+  workflow_call:
+
 # https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
 jobs:
   build:
