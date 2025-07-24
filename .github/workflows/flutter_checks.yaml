@@ -47,6 +47,9 @@ jobs:
           echo "${{ github.event.secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > lib/firebase_options.dart
         shell: bash
 
+      - name: Debug Firebase Options file
+        run: cat lib/firebase_options.dart
+
       - name: Create Google Services JSON (android/app/google-services.json)
         if: ${{ github.event.secrets.GOOGLE_SERVICES_JSON != '' }}
         run: |
