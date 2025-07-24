@@ -21,10 +21,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set environment variables
+        run: |
+          echo "HAS_GOOGLE_SERVICES_JSON=${{ secrets.GOOGLE_SERVICES_JSON != '' }}" >> $GITHUB_ENV
+          echo "HAS_GOOGLE_SERVICE_INFO_PLIST=${{ secrets.GOOGLE_SERVICE_INFO_PLIST != '' }}" >> $GITHUB_ENV
+
+      - name: Log environment variables
+        run: |
+          echo "HAS_GOOGLE_SERVICES_JSON is set to ${HAS_GOOGLE_SERVICES_JSON}"
+          echo "HAS_GOOGLE_SERVICE_INFO_PLIST is set to ${HAS_GOOGLE_SERVICE_INFO_PLIST}"
+
       # For android builds
       # Duration: ~3 minutes
       - name: Set Up Java
-        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
+        if: env.HAS_GOOGLE_SERVICES_JSON == 'true'
         uses: actions/setup-java@v3.12.0
         with:
           distribution: "oracle"
