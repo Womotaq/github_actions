@@ -24,7 +24,7 @@ jobs:
       # For android builds
       # Duration: ~3 minutes
       - name: Set Up Java
-        if: ${{ github.event.secrets.GOOGLE_SERVICES_JSON != '' }}
+        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
         uses: actions/setup-java@v3.12.0
         with:
           distribution: "oracle"
@@ -36,32 +36,32 @@ jobs:
           channel: "stable"
 
       - name: Create Firebase Options file (lib/firebase_options.dart)
-        # run: |
-        #   echo "${{ github.event.secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
         # run: |
         #   # Use heredoc syntax for robust multi-line file creation
         #   cat << EOF > lib/firebase_options.dart
-        #   ${{ github.event.secrets.FIREBASE_OPTIONS_DART }}
+        #   ${{ secrets.FIREBASE_OPTIONS_DART }}
         #   EOF
-        run: |
-          echo "${{ github.event.secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > lib/firebase_options.dart
+        # run: |
+        #   echo "${{ secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > lib/firebase_options.dart
         shell: bash
 
       - name: Debug Firebase Options file
         run: cat lib/firebase_options.dart
 
       - name: Create Google Services JSON (android/app/google-services.json)
-        if: ${{ github.event.secrets.GOOGLE_SERVICES_JSON != '' }}
+        if: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
         run: |
           mkdir -p android/app/
-          echo "${{ github.event.secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
         shell: bash
 
       - name: Create GoogleService-Info.plist (ios/Runner/GoogleService-Info.plist)
-        if: ${{ github.event.secrets.GOOGLE_SERVICE_INFO_PLIST != '' }}
+        if: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST != '' }}
         run: |
           mkdir -p ios/Runner/
-          echo "${{ github.event.secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
         shell: bash
 
       - name: Install dependencies
