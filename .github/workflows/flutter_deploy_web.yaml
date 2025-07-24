@@ -4,9 +4,9 @@ on:
   # This line allows the workflow to be called by other workflows
   workflow_call:
 
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 # https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
 jobs:
