@@ -37,8 +37,16 @@ jobs:
 
       - name: Create Firebase Options file (lib/firebase_options.dart)
         run: |
-          echo "${{ github.event.secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+          # Use heredoc syntax for robust multi-line file creation
+          cat << EOF > lib/firebase_options.dart
+          ${{ github.event.secrets.FIREBASE_OPTIONS_DART }}
+          EOF
         shell: bash
+
+      # - name: Create Firebase Options file (lib/firebase_options.dart)
+      #   run: |
+      #     echo "${{ github.event.secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+      #   shell: bash
 
       - name: Create Google Services JSON (android/app/google-services.json)
         if: ${{ github.event.secrets.GOOGLE_SERVICES_JSON != '' }}
@@ -56,9 +64,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      # - name: Create dotenv file
-      #   run: echo "${{ github.event.secrets.DOTENV_FILE }}" > dotenv
 
       # TODO : only triggered by wo_form_example
       - name: Update wo_form version file
