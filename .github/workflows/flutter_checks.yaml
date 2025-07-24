@@ -43,13 +43,13 @@ jobs:
       - name: Create Firebase Options file (lib/firebase_options.dart)
         # run: |
         #   echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
-        run: |
-          # Use heredoc syntax for robust multi-line file creation
-          cat << EOF > lib/firebase_options.dart
-          ${{ secrets.FIREBASE_OPTIONS_DART }}
-          EOF
         # run: |
-        #   echo "${{ secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > lib/firebase_options.dart
+        #   # Use heredoc syntax for robust multi-line file creation
+        #   cat << EOF > lib/firebase_options.dart
+        #   ${{ secrets.FIREBASE_OPTIONS_DART }}
+        #   EOF
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > lib/firebase_options.dart
         shell: bash
 
       - name: Debug Firebase Options file
