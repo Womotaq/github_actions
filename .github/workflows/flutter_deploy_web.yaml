@@ -1,5 +1,5 @@
 # Should be called on push to main
-name: Flutter Deploy Web
+name: Flutter Web Deployment
 
 on:
   # This line allows the workflow to be called by other workflows
@@ -35,9 +35,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Debug FIREBASE_SERVICE_ACCOUNT
-        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0

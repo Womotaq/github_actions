@@ -1,5 +1,5 @@
-# Should be called on pull_requests
-name: Flutter PR Checks
+# Should be called on pull_requests or before deployment
+name: Flutter Build
 
 on:
   # This line allows the workflow to be called by other workflows
