@@ -11,6 +11,8 @@ on:
         required: false
       GOOGLE_SERVICE_INFO_PLIST: # If provided, will build for iOS
         required: false
+      FIREBASE_SERVICE_ACCOUNT: # If provided, will build for iOS
+        required: false
 
 # https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
 jobs:
@@ -24,7 +26,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest # macos-latest if needing an ios build
     needs: build
-    if: github.event_name == 'push'
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
