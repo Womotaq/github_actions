@@ -22,7 +22,7 @@ on:
 # https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
 jobs:
   build:
-    uses: Womotaq/github_actions/.github/workflows/flutter_checks.yaml@main
+    uses: Womotaq/github_actions/.github/workflows/flutter_build.yaml@main
     with:
       pre_build_command: ${{ inputs.pre_build_command }}
     secrets:
