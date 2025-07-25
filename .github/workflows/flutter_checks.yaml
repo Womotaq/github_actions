@@ -4,6 +4,11 @@ name: Flutter Build
 on:
   # This line allows the workflow to be called by other workflows
   workflow_call:
+    inputs:
+      pre_build_command:
+        description: "Command to run before building Flutter web"
+        required: false
+        type: string
     secrets:
       FIREBASE_OPTIONS_DART:
         required: true
@@ -52,9 +57,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # TODO : only triggered by wo_form_example
-      - name: Update wo_form version file
-        run: dart lib/wo_form_version/generate_version.dart
+      - name: Run Pre-Build Command
+        if: inputs.pre_build_command != ''
+        run: ${{ inputs.pre_build_command }}
 
       - name: Build Flutter Web
         run: flutter build web

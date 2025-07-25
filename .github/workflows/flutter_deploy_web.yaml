@@ -4,6 +4,11 @@ name: Flutter Web Deployment
 on:
   # This line allows the workflow to be called by other workflows
   workflow_call:
+    inputs:
+      pre_build_command:
+        description: "Command to run before building Flutter web"
+        required: false
+        type: string
     secrets:
       FIREBASE_OPTIONS_DART:
         required: true
@@ -18,6 +23,8 @@ on:
 jobs:
   build:
     uses: Womotaq/github_actions/.github/workflows/flutter_checks.yaml@main
+    with:
+      pre_build_command: ${{ inputs.pre_build_command }}
     secrets:
       FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
       GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
