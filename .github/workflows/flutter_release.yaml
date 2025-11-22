@@ -1,0 +1,90 @@
+# See tutorial here : https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
+
+# Orchestrates: Check Tag -> Build -> Tag -> Deploy
+name: Flutter Web Release
+
+on:
+  workflow_call:
+    inputs:
+      pre_build_command:
+        description: "Command to run before building Flutter web"
+        required: false
+        type: string
+    secrets:
+      FIREBASE_OPTIONS_DART:
+        required: true
+      FIREBASE_SERVICE_ACCOUNT:
+        required: true
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  check_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Extract version
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+      - name: Fail if Tag Exists
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ env.VERSION }}" > /dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists. Failing." >&2
+            exit 1
+          fi
+
+  build:
+    needs: check_tag
+    uses: Womotaq/github_actions/.github/workflows/flutter_build.yaml@main
+    with:
+      pre_build_command: ${{ inputs.pre_build_command }}
+    secrets:
+      FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+
+  tag:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Extract version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin "v${VERSION}"
+
+  deploy:
+    needs: tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download web build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: build/web
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live
+          projectId: womotaq-f
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks

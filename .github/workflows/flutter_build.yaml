@@ -1,8 +1,9 @@
-# Should be called on pull_requests or before deployment
-name: Flutter Build
+# See tutorial here : https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
+
+# Should be called on push to main
+name: Flutter Web Build
 
 on:
-  # This line allows the workflow to be called by other workflows
   workflow_call:
     inputs:
       pre_build_command:
@@ -12,41 +13,17 @@ on:
     secrets:
       FIREBASE_OPTIONS_DART:
         required: true
-      GOOGLE_SERVICES_JSON: # If provided, will build for android
-        required: false
-      GOOGLE_SERVICE_INFO_PLIST: # If provided, will build for iOS
-        required: false
 
 jobs:
   build:
-    runs-on: ubuntu-latest # macos-latest if needing an ios build
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set environment variables
-        run: |
-          echo "HAS_GOOGLE_SERVICES_JSON=${{ secrets.GOOGLE_SERVICES_JSON != '' }}" >> $GITHUB_ENV
-          echo "HAS_GOOGLE_SERVICE_INFO_PLIST=${{ secrets.GOOGLE_SERVICE_INFO_PLIST != '' }}" >> $GITHUB_ENV
-
       - name: Create Firebase Options file (lib/firebase_options.dart)
         run: |
           echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
-        shell: bash
-
-      - name: Create Google Services JSON (android/app/google-services.json)
-        if: env.HAS_GOOGLE_SERVICES_JSON == 'true'
-        run: |
-          mkdir -p android/app/
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
-        shell: bash
-
-      - name: Create GoogleService-Info.plist (ios/Runner/GoogleService-Info.plist)
-        if: env.HAS_GOOGLE_SERVICE_INFO_PLIST == 'true'
-        run: |
-          mkdir -p ios/Runner/
-          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
         shell: bash
 
       - name: Set up Flutter
@@ -64,7 +41,7 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web
 
-      - name: Upload build artifacts
+      - name: Upload web build artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-build
