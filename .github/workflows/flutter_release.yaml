@@ -5,11 +5,6 @@ name: Flutter Web Release
 
 on:
   workflow_call:
-    inputs:
-      pre_build_command:
-        description: "Command to run before building Flutter web"
-        required: false
-        type: string
     secrets:
       FIREBASE_OPTIONS_DART:
         required: true
@@ -42,8 +37,6 @@ jobs:
   build:
     needs: check_tag
     uses: Womotaq/github_actions/.github/workflows/flutter_build.yaml@main
-    with:
-      pre_build_command: ${{ inputs.pre_build_command }}
     secrets:
       FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
 

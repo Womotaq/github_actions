@@ -5,11 +5,6 @@ name: Flutter Web Build
 
 on:
   workflow_call:
-    inputs:
-      pre_build_command:
-        description: "Command to run before building Flutter web"
-        required: false
-        type: string
     secrets:
       FIREBASE_OPTIONS_DART:
         required: true
@@ -33,10 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Run Pre-Build Command
-        if: inputs.pre_build_command != ''
-        run: ${{ inputs.pre_build_command }}
 
       - name: Build Flutter Web
         run: flutter build web
