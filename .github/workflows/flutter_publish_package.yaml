@@ -77,7 +77,7 @@ jobs:
   #     FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
 
   deploy:
-    needs: build
+    needs: publish
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
