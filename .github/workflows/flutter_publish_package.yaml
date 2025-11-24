@@ -68,13 +68,13 @@ jobs:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
 
-  build:
-    needs: publish
-    uses: Womotaq/github_actions/.github/workflows/flutter_build.yaml@main
-    with:
-      working_directory: example
-    secrets:
-      FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+  # build:
+  #   needs: publish
+  #   uses: Womotaq/github_actions/.github/workflows/flutter_build.yaml@main
+  #   with:
+  #     working_directory: example
+  #   secrets:
+  #     FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
 
   deploy:
     needs: build
