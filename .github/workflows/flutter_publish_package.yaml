@@ -32,7 +32,7 @@ jobs:
       - name: Check if version exists in CHANGELOG.md
         run: |
           VERSION=${{ env.VERSION }}
-          if ! grep -q "##\s*\[$VERSION\]" CHANGELOG.md; then
+          if ! grep -q "##\s*$VERSION" CHANGELOG.md; then
             echo "❌ CHANGELOG.md does not contain an entry for version [$VERSION]"
             echo "👉 Please add a changelog entry like: '## [$VERSION]'"
             exit 1
