@@ -66,11 +66,13 @@ jobs:
           git push origin "v${VERSION}"
 
   # Publish to pub.dev
+  # Source : https://github.com/dart-lang/setup-dart/blob/v1.7.0/.github/workflows/publish.yml
   publish:
     needs: tag
+    name: 'Publish to pub.dev'
     permissions:
       id-token: write # Required for authentication using OIDC
-    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1.7.0
 
   build:
     needs: tag
