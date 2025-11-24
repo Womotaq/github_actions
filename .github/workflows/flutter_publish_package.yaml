@@ -1,0 +1,101 @@
+# Orchestrates: Check Tag -> Build -> Tag -> Deploy
+name: Flutter Package Release
+
+on:
+  workflow_call:
+    secrets:
+      FIREBASE_OPTIONS_DART:
+        required: true
+      FIREBASE_SERVICE_ACCOUNT:
+        required: true
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  check_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Extract version
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+      - name: Fail if Tag Exists
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ env.VERSION }}" > /dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists. Failing." >&2
+            exit 1
+          fi
+      - name: Check if version exists in CHANGELOG.md
+        run: |
+          VERSION=${{ env.VERSION }}
+          if ! grep -q "##\s*\[$VERSION\]" CHANGELOG.md; then
+            echo "❌ CHANGELOG.md does not contain an entry for version [$VERSION]"
+            echo "👉 Please add a changelog entry like: '## [$VERSION]'"
+            exit 1
+          fi
+          echo "✅ Found changelog entry for [$VERSION]"
+
+
+  tag:
+    needs: check_tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Extract version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin "v${VERSION}"
+
+  # Publish to pub.dev
+  publish:
+    needs: tag
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+
+  build:
+    needs: publish
+    uses: Womotaq/github_actions/.github/workflows/flutter_build.yaml@main
+    with:
+      working_directory: example
+    secrets:
+      FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download web build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: example/build/web
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live
+          projectId: womotaq-f
+          entryPoint: example
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks

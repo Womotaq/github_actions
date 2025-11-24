@@ -8,10 +8,19 @@ on:
     secrets:
       FIREBASE_OPTIONS_DART:
         required: true
+    inputs:
+      working_directory:
+        description: "Directory to run build commands in"
+        required: false
+        type: string
+        default: "."
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,4 +45,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: web-build
-          path: build/web
+          path: ${{ inputs.working_directory }}/build/web
