@@ -81,10 +81,9 @@ jobs:
           channel: "stable"
 
       - run: flutter --version
-      - run: dart --version
-      
-      - name: Analyze check
-        run: dart analyze
+
+      - name: Analyze project source
+        run: flutter analyze
 
       - name: Publish - dry run
         run: dart pub publish --dry-run
