@@ -80,10 +80,10 @@ jobs:
         with:
           channel: "stable"
 
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Analyze checkup
+      - run: flutter --version
+      - run: dart --version
+      
+      - name: Analyze check
         run: dart analyze
 
       - name: Publish - dry run
