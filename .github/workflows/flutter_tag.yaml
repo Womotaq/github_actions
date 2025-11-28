@@ -7,6 +7,7 @@ name: Create tag from version in pubspec.yaml
 on:
   workflow_call:
     secrets:
+      # PAT is required in order to allow other workflows to be triggered by the tag creation
       PAT:
         required: true
 
