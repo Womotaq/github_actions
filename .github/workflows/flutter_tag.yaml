@@ -1,0 +1,48 @@
+name: Create tag from version in pubspec.yaml
+
+# To call this workflow, request the following permission :
+# permissions:
+#   id-token: write
+
+on:
+  workflow_call:
+  
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Extract version
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+
+      - name: Fail if Tag Exists
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ env.VERSION }}" > /dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists. Failing." >&2
+            exit 1
+          fi
+
+      - name: Check if version exists in CHANGELOG.md
+        run: |
+          VERSION=${{ env.VERSION }}
+          if ! grep -q "##\s*$VERSION" CHANGELOG.md; then
+            echo "❌ CHANGELOG.md does not contain an entry for version $VERSION"
+            echo "👉 Please add a changelog entry like: '## $VERSION'"
+            exit 1
+          fi
+          echo "✅ Found changelog entry for [$VERSION]"
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin "v${VERSION}"
